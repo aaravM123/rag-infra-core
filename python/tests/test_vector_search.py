@@ -1,14 +1,5 @@
-import sys
-import os
-import numpy as np
-import time
-
-# Add parent directory (python/) to path to import vector_search wrapper
-_parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if _parent_dir not in sys.path:
-    sys.path.insert(0, _parent_dir)
-
-import vector_search  # type: ignore
+import numpy as np, time
+import vector_search
 
 a = np.random.rand(1536).astype(np.float32)
 b = np.random.rand(1536).astype(np.float32)
