@@ -4,7 +4,7 @@
 #include <numeric>
 #include <omp.h>
 
-float cosine_similarity(cons std::vector<float>& a, const std::vector<float>&b) {
+float cosine_similarity(const std::vector<float>& a, const std::vector<float>& b) {
     float dot = 0.0f, norm_a = 0.0f, norm_b = 0.0f;
     #pragma omp parallel for reduction(+:dot, norm_a, norm_b)
     for (size_t i = 0; i < a.size(); ++i) {
@@ -26,24 +26,27 @@ float l2_distance(const std::vector<float>& a, const std::vector<float>& b) {
 }
 
 
-std::vector<int> search_topk(const std::vector<std::vector<float>>& vectors, const std::vector<float>&query, int k) {
+std::vector<int> search_topk(const std::vector<std::vector<float>>& vectors, const std::vector<float>& query, int k) {
     std::vector<std::pair<float,int>> scores;
     scores.reserve(vectors.size());
     
-    #pragma omp parallel for {
+    #pragma omp parallel
+    {
         std::vector<std::pair<float,int>> local;
         #pragma omp for nowait
         for (size_t i = 0; i < vectors.size(); ++i) {
             local.emplace_back(cosine_similarity(vectors[i], query), i);
+        }
         #pragma omp critical
         scores.insert(scores.end(), local.begin(), local.end());
-        }
     }
 
-    std::partial_sort(scores.begin(), scores.begin()+k, scores.end(), [](auto& a, auto& b) { return a.first > b.first; });
+    int actual_k = std::min(k, static_cast<int>(scores.size()));
+    std::partial_sort(scores.begin(), scores.begin()+actual_k, scores.end(), [](auto& a, auto& b) { return a.first > b.first; });
     
     std::vector<int> topk;
-    for (int i = 0; i < k; ++i) {
+    topk.reserve(actual_k);
+    for (int i = 0; i < actual_k; ++i) {
         topk.push_back(scores[i].second);
-        return topk;
-    }   
+    }
+    return topk;   
