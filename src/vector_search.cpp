@@ -49,4 +49,5 @@ std::vector<int> search_topk(const std::vector<std::vector<float>>& vectors, con
     for (int i = 0; i < actual_k; ++i) {
         topk.push_back(scores[i].second);
     }
-    return topk;   
+    return topk;
+}   
