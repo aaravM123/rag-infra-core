@@ -17,10 +17,8 @@ def benchmark(num_vectors=10000, dim = 1536, k=5):
     t1 = time.time()
 
     # C++
-    vec_list = [v.tolist() for v in vecs]
-    query_list = query.tolist()
     t2 = time.time()
-    cpp_topk = vector_search.search_topk(vec_list, query_list, k)
+    cpp_topk = vector_search.search_topk_np(vecs, query, k)
     t3 = time.time()
 
     return {
@@ -29,13 +27,13 @@ def benchmark(num_vectors=10000, dim = 1536, k=5):
         "k": k,
         "python_time": round(t1-t0, 4),
         "cpp_time": round(t3-t2, 4),
-        "speedup": round(t0-t1 / (t3-t2), 4),
+        "speedup": round(t1-t0 / (t3-t2 + 1e-9), 4),
         "topk_match": len(set(py_topk).intersection(cpp_topk)),
     }
 
 if __name__ == "__main__":
     results = []
-    for n in [1000, 5000, 10000, 20000]:
+    for n in [10000, 20000, 40000, 80000]:
         print(f"Running benchmark with {n} vectors...")
         res = benchmark(num_vectors=n)
         print(res)
