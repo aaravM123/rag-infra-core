@@ -32,6 +32,8 @@ py::array_t<int> search_topk_np(py::array_t<float> vectors,
     size_t num_vecs = vec_buf.shape[0];
     size_t dim      = vec_buf.shape[1];
 
+    int actual_k = std::min(k, static_cast<int>(num_vecs));
+
     std::vector<std::pair<float,int>> scores(num_vecs);
 
     #pragma omp parallel for
@@ -40,12 +42,12 @@ py::array_t<int> search_topk_np(py::array_t<float> vectors,
         scores[i] = {sim, (int)i};
     }
 
-    std::partial_sort(scores.begin(), scores.begin() + k, scores.end(),
+    std::partial_sort(scores.begin(), scores.begin() + actual_k, scores.end(),
                       [](auto &a, auto &b){ return a.first > b.first; });
 
-    py::array_t<int> topk(k);
+    py::array_t<int> topk(actual_k);
     auto r = topk.mutable_unchecked<1>();
-    for (int i = 0; i < k; ++i)
+    for (int i = 0; i < actual_k; ++i)
         r(i) = scores[i].second;
 
     return topk;
