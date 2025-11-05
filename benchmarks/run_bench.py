@@ -27,7 +27,7 @@ def benchmark(num_vectors=10000, dim = 1536, k=5):
         "k": k,
         "python_time": round(t1-t0, 4),
         "cpp_time": round(t3-t2, 4),
-        "speedup": round(t1-t0 / (t3-t2 + 1e-9), 4),
+        "speedup": round((t1-t0) / (t3-t2 + 1e-9), 4),
         "topk_match": len(set(py_topk).intersection(cpp_topk)),
     }
 
