@@ -6,7 +6,7 @@ DB_CONFIG = dict(
     user = "postgres",
     password = "postgres",
     host="localhost",
-    port="5432",
+    port="5433",
 )
 
 def fetch_embeddings(limit=1000):
